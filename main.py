@@ -9,11 +9,16 @@ MODEL_NAME = "Qwen/Qwen2.5-1.5B-Instruct"
 app = FastAPI()
 
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+
 model = AutoModelForCausalLM.from_pretrained(
     MODEL_NAME,
     torch_dtype="auto",
     device_map="auto",
 )
+
+print("cuda:", torch.cuda.is_available())
+print("device:", model.device)
+print(next(model.parameters()).device)
 
 class ChatRequest(BaseModel):
     message: str
