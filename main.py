@@ -19,7 +19,7 @@ model = AutoModelForCausalLM.from_pretrained(
 
 class ChatRequest(BaseModel):
     message: str
-    tables: dict
+    schema: dict
 
 
 class ChatResponse(BaseModel):
@@ -52,7 +52,7 @@ def chat(payload: ChatRequest) -> ChatResponse:
                 "Return only valid Python Polars code. "
                 "No markdown fences. "
                 "Assign the final Polars DataFrame to result. "
-                f"Available datasets: {json.dumps(payload.tables, ensure_ascii=False)}"
+                f"Available datasets: {json.dumps(payload.schema, ensure_ascii=False)}"
             ),
         },
         {
