@@ -75,6 +75,34 @@ def chat(payload: ChatRequest) -> ChatResponse:
                 "- No markdown\n\n"
 
                 "Return only valid Python Polars code. "
+                "Here is an example of question you will received with the answer expected (gol_code)"
+                {
+                    "id": "PIP01",
+                    "question": "Top 5 customers by total spending on Seafood products. Full chain: order_details → products → categories (filter Seafood) → orders → customers.",
+                    "datasets": {
+                        "nw_order_details": {
+                        "file_name": "data/nw_order_details.parquet",
+                        "format": "parquet"
+                        },
+                        "nw_products": {
+                        "file_name": "data/nw_products.parquet",
+                        "format": "parquet"
+                        },
+                        "nw_categories": {
+                        "file_name": "data/nw_categories.parquet",
+                        "format": "parquet"
+                        },
+                        "nw_orders": {
+                        "file_name": "data/nw_orders.parquet",
+                        "format": "parquet"
+                        },
+                        "nw_customers": {
+                        "file_name": "data/nw_customers.parquet",
+                        "format": "parquet"
+                        }
+                    },
+                    "gold_code": "result = nw_order_details.join(nw_products, on=\"product_id\").join(nw_categories, on=\"category_id\").filter(pl.col(\"category_name\") == \"Seafood\").with_columns((pl.col(\"unit_price\") * pl.col(\"quantity\") * (1 - pl.col(\"discount\"))).alias(\"revenue\")).group_by(\"order_id\").agg(pl.col(\"revenue\").sum().alias(\"order_rev\")).join(nw_orders, on=\"order_id\").group_by(\"customer_id\").agg(pl.col(\"order_rev\").sum().round(2).alias(\"total_spent\")).sort(\"total_spent\", descending=True).head(5).join(nw_customers, on=\"customer_id\").select(\"company_name\", \"country\", \"total_spent\")"
+                }"
                 "No markdown fences. "
                 "Assign the final Polars DataFrame to result. "
                 f"Available datasets: {json.dumps(payload.tables, ensure_ascii=False)}"
