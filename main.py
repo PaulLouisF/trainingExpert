@@ -79,6 +79,7 @@ def chat(payload: ChatRequest) -> ChatResponse:
     - Use correct join keys
     - Apply filters AFTER joins when needed
     - Compute metrics with .with_columns()
+    - Check colums_name
 
     Example pattern:
 
