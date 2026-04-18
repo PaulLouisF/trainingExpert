@@ -62,7 +62,7 @@ def chat(payload: ChatRequest) -> ChatResponse:
             "role": "system",
             "content": (
                 "You are a senior data engineer using Polars.\n\n"
-                
+
                 "Follow this process:\n"
                 "1. Identify dataset\n"
                 "2. Identify required columns\n"
@@ -73,16 +73,11 @@ def chat(payload: ChatRequest) -> ChatResponse:
                 "- Do not guess\n"
                 "- Assign final result to 'result'\n"
                 "- No markdown\n\n"
-                
-                "Output format:\n"
-                "PLAN:\n"
-                "- dataset:\n"
-                "- columns:\n"
-                "- operations:\n\n"
-                "CODE:\n"
-                "valid python code\n\n"
-                
-                f"Datasets: {json.dumps(payload.tables, ensure_ascii=False)}"
+
+                "Return only valid Python Polars code. "
+                "No markdown fences. "
+                "Assign the final Polars DataFrame to result. "
+                f"Available datasets: {json.dumps(payload.tables, ensure_ascii=False)}"
             ),
         },
         {
