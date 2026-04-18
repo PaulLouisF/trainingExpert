@@ -101,7 +101,7 @@ def chat(payload: ChatRequest) -> ChatResponse:
 
     outputs = model.generate(
         **inputs,
-        max_new_tokens=256,
+        max_new_tokens=3000,
         do_sample=False,
         pad_token_id=tokenizer.eos_token_id,
         eos_token_id=tokenizer.eos_token_id,
