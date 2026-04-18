@@ -120,7 +120,7 @@ def chat(payload: ChatRequest) -> ChatResponse:
         do_sample=False,
         pad_token_id=tokenizer.eos_token_id,
         eos_token_id=tokenizer.eos_token_id,
-        use_cache=True,
+        use_cache=False,
     )
 
     response = tokenizer.decode(
