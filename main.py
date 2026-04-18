@@ -6,7 +6,8 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-MODEL_NAME = "Qwen/Qwen2.5-Coder-7B-Instruct"
+# ⚡ ONLY CHANGE: quantized faster model
+MODEL_NAME = "Qwen/Qwen2.5-Coder-7B-Instruct-AWQ"
 
 app = FastAPI()
 
