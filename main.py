@@ -60,59 +60,54 @@ def chat(payload: ChatRequest) -> ChatResponse:
     messages = [
         {
             "role": "system",
-            "content": (
-                "You are a senior data engineer using Polars.\n\n"
+            "content": f"""
+    You are a senior data engineer writing Polars code.
 
-                "Follow this process:\n"
-                "1. Identify dataset\n"
-                "2. Identify required columns\n"
-                "3. Define transformations\n\n"
-                
-                "Rules:\n"
-                "- Use only existing columns\n"
-                "- Do not guess\n"
-                "- Assign final result to 'result'\n"
-                "- No markdown\n\n"
+    Task:
+    Convert natural language questions into correct Polars DataFrame code.
 
-                "Return only valid Python Polars code. "
-                "Here is an example of question you will received with the answer expected (gol_code)"
-                {
-                    "id": "PIP01",
-                    "question": "Top 5 customers by total spending on Seafood products. Full chain: order_details → products → categories (filter Seafood) → orders → customers.",
-                    "datasets": {
-                        "nw_order_details": {
-                        "file_name": "data/nw_order_details.parquet",
-                        "format": "parquet"
-                        },
-                        "nw_products": {
-                        "file_name": "data/nw_products.parquet",
-                        "format": "parquet"
-                        },
-                        "nw_categories": {
-                        "file_name": "data/nw_categories.parquet",
-                        "format": "parquet"
-                        },
-                        "nw_orders": {
-                        "file_name": "data/nw_orders.parquet",
-                        "format": "parquet"
-                        },
-                        "nw_customers": {
-                        "file_name": "data/nw_customers.parquet",
-                        "format": "parquet"
-                        }
-                    },
-                    "gold_code": "result = nw_order_details.join(nw_products, on=\"product_id\").join(nw_categories, on=\"category_id\").filter(pl.col(\"category_name\") == \"Seafood\").with_columns((pl.col(\"unit_price\") * pl.col(\"quantity\") * (1 - pl.col(\"discount\"))).alias(\"revenue\")).group_by(\"order_id\").agg(pl.col(\"revenue\").sum().alias(\"order_rev\")).join(nw_orders, on=\"order_id\").group_by(\"customer_id\").agg(pl.col(\"order_rev\").sum().round(2).alias(\"total_spent\")).sort(\"total_spent\", descending=True).head(5).join(nw_customers, on=\"customer_id\").select(\"company_name\", \"country\", \"total_spent\")"
-                }"
-                "No markdown fences. "
-                "Assign the final Polars DataFrame to result. "
-                f"Available datasets: {json.dumps(payload.tables, ensure_ascii=False)}"
-            ),
+    Rules:
+    - Use ONLY provided datasets and columns
+    - Never guess columns or tables
+    - Output ONLY valid Python code (no markdown, no explanation)
+    - Final result MUST be assigned to variable: result
+
+    Core transformation pattern:
+    join → filter → compute features → group_by → aggregate → sort
+
+    Important:
+    - Use correct join keys
+    - Apply filters AFTER joins when needed
+    - Compute metrics with .with_columns()
+
+    Example pattern:
+
+    result = (
+        nw_order_details
+        .join(nw_products, on="product_id")
+        .join(nw_categories, on="category_id")
+        .filter(pl.col("category_name") == "Seafood")
+        .with_columns(
+            (pl.col("unit_price") * pl.col("quantity") * (1 - pl.col("discount"))).alias("revenue")
+        )
+        .join(nw_orders, on="order_id")
+        .group_by("customer_id")
+        .agg(pl.col("revenue").sum().alias("total_spent"))
+        .sort("total_spent", descending=True)
+        .head(5)
+    )
+
+    Available datasets:
+    {json.dumps(payload.tables, ensure_ascii=False)}
+    """
         },
         {
             "role": "user",
             "content": payload.message,
         },
     ]
+
+    
 
     text = tokenizer.apply_chat_template(
         messages,
